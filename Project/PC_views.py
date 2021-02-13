@@ -8,7 +8,11 @@ def index_view(request):
 
 
 def services_views(request):
-    return '200 OK', 'Services'
+    return '200 OK', render('services.html')
+
+
+def team_view(request):
+    return '200 OK', render('team.html')
 
 
 def contacts_view(request):
