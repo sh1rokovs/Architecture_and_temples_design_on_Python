@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}
+Список услуг
+{% endblock %}
+{% block body %}
+{% include "inc-menu.html" %}
+<h1>Список услуг</h1>
+<ul>
+
+    {% for item in objects_list %}
+    <li>
+        {{item.name}} <span><a href="/copy-service/?name={{item.name}}">скопировать</a></span>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}
