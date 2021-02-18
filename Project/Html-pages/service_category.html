@@ -4,12 +4,12 @@
 {% endblock %}
 {% block body %}
 {% include "inc-menu.html" %}
-<h1>Список услуг</h1>
+<h1>Список категорий</h1>
 <ul>
 
     {% for item in objects_list %}
     <li>
-        {{item.name}} <span><a href="/copy-service/?name={{item.name}}">скопировать</a></span>
+        {{item.name}} <span>Количество услуг: {{item.service_count()}}</span>
     </li>
     {% endfor %}
 </ul>

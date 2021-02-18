@@ -1,5 +1,11 @@
 class Application:
 
+    def add_route(self, url):
+        def internal(view):
+            self.routes[url] = view
+
+        return internal
+
     def parse_input_data(self, data: str):
         result = {}
         if data:
@@ -53,3 +59,27 @@ class Application:
         else:
             start_response('404 Not Found', [('Content-Type', 'text/html')])
             return [b'404 Not Found']
+
+
+class DebugApplication(Application):
+
+    def __init__(self, routes, fronts):
+        self.application = Application(routes, fronts)
+        super().__init__(routes, fronts)
+
+    def __call__(self, environ, start_response):
+        print('Debug')
+        print(environ)
+        print(start_response)
+        return self.application(environ, start_response)
+
+
+class MockApplication(Application):
+
+    def __init__(self, routes, fronts):
+        self.application = Application(routes, fronts)
+        super().__init__(routes, fronts)
+
+    def __call__(self, environ, start_response):
+        start_response('200 OK', [('Content-Type', 'text/html')])
+        return [b'Hello from mockapplication']
