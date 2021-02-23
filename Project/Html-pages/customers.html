@@ -1,14 +1,17 @@
 {% extends "base.html" %}
 {% block title %}
-Список услуг
+Список покупателей
 {% endblock %}
 {% block body %}
 {% include "include_menu.html" %}
-<h1>Список категорий</h1>
+<h1>Список покупателей</h1>
 <ul>
     {% for item in objects_list %}
     <li>
-        {{item.name}} <span>Количество услуг: {{item.service_count()}}</span>
+        {{item.name}}
+        {% for service in item.services %}
+            {{service.name}}
+        {% endfor %}
     </li>
     {% endfor %}
 </ul>

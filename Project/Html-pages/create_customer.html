@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}
+Создание покупателя
+{% endblock %}
+{% block body %}
+{% include "include_menu.html" %}
+<h1>Создание Покупателя</h1>
+<form method="post">
+    <input type="text" name="name" placeholder="Имя">
+    <button type="submit">Сохранить</button>
+</form>
+{% endblock %}

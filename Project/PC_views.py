@@ -1,8 +1,10 @@
 from framework.template import render
+from framework.cbv import CreateView, ListView
 from login import debug, Logger
-from models import SiteWIthServices
+from models import SiteWIthServices, EmailNotifier
 
 
+email_notifier = EmailNotifier()
 site = SiteWIthServices()
 logs = Logger('main.py')
 
@@ -23,20 +25,27 @@ def create_service_view(request):
         name = data['name']
         category_id = data.get('category_id')
         print(category_id)
-        category = None
         if category_id:
             category = site.find_category_by_id(int(category_id))
-            course = site.create_service('record', name, category)
-            site.services.append(course)
-        return '200 OK', render('create_services.html')
+            services = site.create_service('record', name, category)
+            services.observers.append(email_notifier)
+            site.services.append(services)
+        categories = site.categories
+        return '200 OK', render('create_service.html', categories=categories)
     else:
         categories = site.categories
-        return '200 OK', render('create_services.html', categories=categories)
+        return '200 OK', render('create_service.html', categories=categories)
 
 
-def create_category_view(request):
-    if request['method'] == 'POST':
-        data = request['data']
+class CategoryCreateView(CreateView):
+    template_name = 'create_category.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['categories'] = site.categories
+        return context
+
+    def create_obj(self, data: dict):
         name = data['name']
         category_id = data.get('category_id')
         category = None
@@ -44,10 +53,42 @@ def create_category_view(request):
             category = site.find_category_by_id(int(category_id))
         new_category = site.create_category(name, category)
         site.categories.append(new_category)
-        return '200 OK', render('create_category.html')
-    else:
-        categories = site.categories
-        return '200 OK', render('create_category.html', categories=categories)
+
+
+class CategoryListView(ListView):
+    queryset = site.categories
+    template_name = 'service_category.html'
+
+
+class CustomerListView(ListView):
+    queryset = site.customer
+    template_name = 'customers.html'
+
+
+class CustomerCreateView(CreateView):
+    template_name = 'create_customer.html'
+
+    def create_obj(self, data: dict):
+        name = data['name']
+        new_obj = site.create_user('student', name)
+        site.customer.append(new_obj)
+
+
+class AddCustomerByServiceCreateView(CreateView):
+    template_name = 'add_customer.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['services'] = site.services
+        context['customer'] = site.customer
+        return context
+
+    def create_obj(self, data: dict):
+        service_name = data['service_name']
+        service = site.get_service(service_name)
+        customer_name = data['customer_name']
+        customer = site.get_customer(customer_name)
+        service.add_customer(customer)
 
 
 def team_view(request):
