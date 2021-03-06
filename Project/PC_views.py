@@ -1,12 +1,15 @@
 from framework.template import render
 from framework.cbv import CreateView, ListView
 from login import debug, Logger
+from mapper import MapperRegistry
 from models import SiteWIthServices, EmailNotifier
-
+from orm.unit_work import UnitOfWork
 
 email_notifier = EmailNotifier()
 site = SiteWIthServices()
 logs = Logger('main.py')
+UnitOfWork.new_current()
+UnitOfWork.get_current().set_mapper_registry(MapperRegistry)
 
 
 def index_view(request):
@@ -61,8 +64,11 @@ class CategoryListView(ListView):
 
 
 class CustomerListView(ListView):
-    queryset = site.customer
     template_name = 'customers.html'
+
+    def get_queryset(self):
+        mapper = MapperRegistry.get_current_mapper('student')
+        return mapper.all()
 
 
 class CustomerCreateView(CreateView):
@@ -72,6 +78,8 @@ class CustomerCreateView(CreateView):
         name = data['name']
         new_obj = site.create_user('student', name)
         site.customer.append(new_obj)
+        new_obj.mark_new()
+        UnitOfWork.get_current().commit()
 
 
 class AddCustomerByServiceCreateView(CreateView):

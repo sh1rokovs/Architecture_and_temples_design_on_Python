@@ -1,5 +1,6 @@
 from patterns.prototype import PrototypeMixin
 from patterns.observer import Subject, Observer
+from orm.unit_work import DomainObject
 import jsonpickle
 
 
@@ -8,7 +9,7 @@ class User:
         self.name = name
 
 
-class Customer(User):
+class Customer(User, DomainObject):
     def __init__(self, name):
         self.services = []
         super().__init__(name)

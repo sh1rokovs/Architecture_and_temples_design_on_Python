@@ -20,11 +20,13 @@ class FileWrite:
 
 class Logger(metaclass=SingletonByName):
 
-    def __init__(self, name):
+    def __init__(self, name, writer=ConsoleWrite()):
         self.name = name
+        self.writer = writer
 
     def logs(self, text):
-        print('logs:', text)
+        text = f'log: {text}'
+        self.writer.write(text)
 
 
 def debug(func):
